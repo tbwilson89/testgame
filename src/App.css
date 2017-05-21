@@ -1,0 +1,24 @@
+.App {
+  text-align: center;
+  background-color: black; }
+
+.gameBoard {
+  display: block;
+  border: 1px solid black;
+  align-content: center;
+  margin: 25px auto;
+  max-width: 1600px; }
+
+.boardRow {
+  display: flex;
+  align-content: space-between;
+  justify-content: center;
+  margin: 0 auto; }
+
+.boardSection {
+  height: 50px;
+  width: 50px;
+  margin: 2px;
+  border: 1px solid black; }
+
+/*# sourceMappingURL=App.css.map */
