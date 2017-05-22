@@ -6,8 +6,10 @@ export default class TileInformation extends Component {
       <div className='tileInformation'>
         Testing:
         <p>
-          {this.props.information.unitName}
-          {this.props.information.spaceValue}
+          Unit Name: {this.props.information.unitName}
+        </p>
+        <p>
+          Space Value: {this.props.information.spaceValue}
         </p>
       </div>
     )
