@@ -4,7 +4,7 @@ export default class RowSection extends Component {
   render(){
     return(
       <div className='boardSection' onClick={() => this.props.onClick(this.props.curRow, this.props.curCol)}>
-        {this.props.currentValue}
+        {this.props.currentValue.spaceValue}
       </div>
     )
   }

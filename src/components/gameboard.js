@@ -8,9 +8,10 @@ export default class Gameboard extends Component {
     super()
 
     this.state = {
-      boardRows: 10,
-      boardColumns: 8,
-      boardState: []
+      boardRows: 15,
+      boardColumns: 15,
+      boardState: [],
+      testValue: ''
     }
     this.setBoardState = this.setBoardState.bind(this)
     this.updateSectionValue = this.updateSectionValue.bind(this)
@@ -24,7 +25,7 @@ export default class Gameboard extends Component {
     for(let i=0;i<this.state.boardRows; i++){
       let tempInsideArray = []
       for(let i=0;i<this.state.boardColumns; i++){
-        tempInsideArray.push(' ')
+        tempInsideArray.push({})
       }
       tempArray.push(tempInsideArray)
     }
@@ -36,10 +37,11 @@ export default class Gameboard extends Component {
   updateSectionValue(curRow, curCol){
     let tempBoardState = this.state.boardState
     console.log(curRow, curCol)
-    tempBoardState[curRow - 1][curCol - 1] = 'X'
+    tempBoardState[curRow - 1][curCol - 1].spaceValue = 'X'
     this.setState({
       boardState: tempBoardState
     })
+    console.log(this.state.boardState[curRow - 1][curCol - 1])
   }
 
   render(){
