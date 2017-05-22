@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 
 import BoardRow from './boardRow'
+import TileInformation from './tileinformation'
 
 export default class Gameboard extends Component {
 
@@ -11,6 +12,9 @@ export default class Gameboard extends Component {
       boardRows: 15,
       boardColumns: 15,
       boardState: [],
+      selectedTileRow: 0,
+      selectedTileCol: 0,
+      tileInformation: [],
       testValue: ''
     }
     this.setBoardState = this.setBoardState.bind(this)
@@ -25,7 +29,7 @@ export default class Gameboard extends Component {
     for(let i=0;i<this.state.boardRows; i++){
       let tempInsideArray = []
       for(let i=0;i<this.state.boardColumns; i++){
-        tempInsideArray.push({})
+        tempInsideArray.push([])
       }
       tempArray.push(tempInsideArray)
     }
@@ -38,8 +42,17 @@ export default class Gameboard extends Component {
     let tempBoardState = this.state.boardState
     console.log(curRow, curCol)
     tempBoardState[curRow - 1][curCol - 1].spaceValue = 'X'
+    tempBoardState[curRow - 1][curCol - 1].unitName = 'Test Unit 01'
+
+    //Create array of tile object to display
+    let tempTileInformation = []
+    tempTileInformation.push(tempBoardState[curRow - 1][curCol - 1])
+    console.log(tempTileInformation)
+
     this.setState({
-      boardState: tempBoardState
+      boardState: tempBoardState,
+      selectedTileRow: curRow,
+      selectedTileCol: curCol
     })
     console.log(this.state.boardState[curRow - 1][curCol - 1])
   }
@@ -59,9 +72,24 @@ export default class Gameboard extends Component {
       )
       currentRow++
     }
+
+    let row = parseInt(this.state.selectedTileRow, 10) - 1 >= 0 ? parseInt(this.state.selectedTileRow, 10) - 1 : 0
+    let col = parseInt(this.state.selectedTileCol, 10) - 1 >= 0 ? parseInt(this.state.selectedTileCol, 10) - 1 : 0
+    console.log(this.state.boardState)
+    console.log(this.state.boardState[row][col])
+    let information
+    if (this.state.boardState[row][col]){
+      console.log('test')
+      information = this.state.boardState[row][col]
+    } else {
+      information = "Please Select a Tile"
+    }
+    console.log(information)
+
     return(
       <div className='gameBoard'>
         {currentGameBoard}
+        <TileInformation information={information}/>
       </div>
     )
   }
