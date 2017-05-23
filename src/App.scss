@@ -4,7 +4,7 @@
 }
 
 .gameBoard {
-  display: block;
+  display: flex;
   border: 1px solid black;
   align-content: center;
   margin: 25px auto;
@@ -21,4 +21,16 @@
   width: 50px;
   margin: 2px;
   border: 1px solid black;
+}
+.playSpace {
+  width: 70%;
+}
+.TileInformation {
+  width: 30%;
+}
+
+
+//UNITS
+#warrior {
+
 }

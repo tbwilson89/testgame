@@ -15,7 +15,7 @@ export default class BoardRow extends Component {
           curRow={this.props.currentRow}
           curCol={currentNum}
           currentValue={this.props.currentRowValues[currentNum-1]}
-          onClick={this.props.onClick}
+          handleClick={this.props.handleClick}
         />
       )
       currentNum++
