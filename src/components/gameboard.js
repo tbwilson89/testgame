@@ -22,6 +22,8 @@ export default class Gameboard extends Component {
     this.setBoardState = this.setBoardState.bind(this)
     this.updateSectionValue = this.updateSectionValue.bind(this)
     this.handleControls = this.handleControls.bind(this)
+    this.handleEndTurn = this.handleEndTurn.bind(this)
+    this.selectTile = this.selectTile.bind(this)
   }
   componentWillMount(){
     this.setBoardState()
@@ -45,11 +47,33 @@ export default class Gameboard extends Component {
       unitToPlace: unit
     })
   }
+  handleEndTurn(){
+    let changePlayer = this.state.currentPlayer === 1 ? 2 : 1
+    this.setState({
+      currentPlayer: changePlayer
+    })
+  }
+
+  selectTile(curRow, curCol){
+    //let arrayRow = curRow - 1
+    //let arrayCol = curCol - 1
+    if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol){
+      this.updateSectionValue(curRow, curCol)
+    } else {
+      this.setState({
+        selectedTileRow: curRow,
+        selectedTileCol: curCol
+      })
+    }
+  }
 
   updateSectionValue(curRow, curCol){
     let tempBoardState = this.state.boardState
-    tempBoardState[curRow - 1][curCol - 1].spaceValue = 'X'
-    tempBoardState[curRow - 1][curCol - 1].unitName = this.state.unitToPlace
+    let arrayRow = curRow - 1
+    let arrayCol = curCol - 1
+    tempBoardState[arrayRow][arrayCol].spaceValue = 'X'
+    tempBoardState[arrayRow][arrayCol].unitName = this.state.unitToPlace
+    tempBoardState[arrayRow][arrayCol].controllingPlayer = this.state.currentPlayer
 
     //Highlight Selection on click
     if('row'+this.state.selectedTileRow !== 0 && this.state.selectedTileCol !== 0){
@@ -67,12 +91,10 @@ export default class Gameboard extends Component {
         break;
     }
 
-    let changePlayer = this.state.currentPlayer === 1 ? 2 : 1
     this.setState({
       boardState: tempBoardState,
       selectedTileRow: curRow,
       selectedTileCol: curCol,
-      currentPlayer: changePlayer
     })
   }
 
@@ -88,12 +110,17 @@ export default class Gameboard extends Component {
           boardRows={this.state.boardRows}
           boardColumns={this.state.boardColumns}
           boardState={this.state.boardState}
-          handleClick={this.updateSectionValue}
+          handleClick={this.selectTile}
         />
         <div className='playerControls'>
-          <TileInformation information={information}/>
-          <PlayerControls handleClick={this.handleControls} handleEndTurn={this.handleEndTurn}/>
-          
+          <TileInformation
+            information={information}
+            currentPlayer={this.state.currentPlayer}
+          />
+          <PlayerControls
+            handleClick={this.handleControls}
+            handleEndTurn={this.handleEndTurn}
+          />
         </div>
       </div>
     )

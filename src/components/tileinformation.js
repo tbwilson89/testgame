@@ -11,6 +11,12 @@ export default class TileInformation extends Component {
         <p>
           Space Value: {this.props.information.spaceValue}
         </p>
+        <p>
+          Controlling Player: {this.props.information.controllingPlayer}
+        </p>
+        <p>
+          Current Player: {this.props.currentPlayer}
+        </p>
       </div>
     )
   }
