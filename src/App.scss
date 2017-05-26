@@ -3,6 +3,11 @@
   background-color: black;
 }
 
+::selection {
+    background-color:Transparent;
+    color:#000;
+}
+
 .gameBoard {
   display: flex;
   border: 1px solid black;
@@ -28,8 +33,15 @@
 .TileInformation {
   width: 30%;
 }
-
-
+.selectedTile {
+  box-shadow: 0 0 5px black;
+}
+.playerOneControls {
+  box-shadow: 0 0 2px lightgreen inset;
+}
+.playerOneControls {
+  box-shadow: 0 0 2px red inset;
+}
 //UNITS
 #warrior {
 

@@ -4,6 +4,10 @@ import PlaySpace from './playspace'
 import TileInformation from './tileinformation'
 import PlayerControls from './playercontrols'
 
+import warriorImage from '../images/warrior.png'
+import mageImage from '../images/mage.png'
+
+
 export default class Gameboard extends Component {
 
   constructor(){
@@ -17,7 +21,9 @@ export default class Gameboard extends Component {
       selectedTileRow: 0,
       selectedTileCol: 0,
       tileInformation: [],
-      testValue: ''
+      testValue: '',
+      unitToPlace: '',
+      unitImage: ''
     }
     this.setBoardState = this.setBoardState.bind(this)
     this.updateSectionValue = this.updateSectionValue.bind(this)
@@ -55,9 +61,14 @@ export default class Gameboard extends Component {
   }
 
   selectTile(curRow, curCol){
-    //let arrayRow = curRow - 1
-    //let arrayCol = curCol - 1
-    if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol){
+    let arrayRow = curRow - 1
+    let arrayCol = curCol - 1
+    let tempBoardState = this.state.boardState
+    if(this.state.selectedTileRow !== 0 && this.state.selectedTileCol !== 0){
+      tempBoardState[parseInt(this.state.selectedTileRow, 10) - 1][parseInt(this.state.selectedTileCol, 10) - 1].selected = false
+    }
+    tempBoardState[arrayRow][arrayCol].selected = true
+    if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol && this.state.unitToPlace !== ''){
       this.updateSectionValue(curRow, curCol)
     } else {
       this.setState({
@@ -74,6 +85,17 @@ export default class Gameboard extends Component {
     tempBoardState[arrayRow][arrayCol].spaceValue = 'X'
     tempBoardState[arrayRow][arrayCol].unitName = this.state.unitToPlace
     tempBoardState[arrayRow][arrayCol].controllingPlayer = this.state.currentPlayer
+    switch(this.state.unitToPlace){
+      case 'Warrior':
+      tempBoardState[arrayRow][arrayCol].unitImage = warriorImage
+      break;
+      case 'Mage':
+      tempBoardState[arrayRow][arrayCol].unitImage = mageImage
+      break;
+      default:
+      break;
+    }
+
 
     //Highlight Selection on click
     if('row'+this.state.selectedTileRow !== 0 && this.state.selectedTileCol !== 0){
@@ -121,6 +143,7 @@ export default class Gameboard extends Component {
             handleClick={this.handleControls}
             handleEndTurn={this.handleEndTurn}
           />
+          <img src={warriorImage} alt='this'></img>
         </div>
       </div>
     )
