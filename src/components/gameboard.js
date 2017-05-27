@@ -23,7 +23,7 @@ export default class Gameboard extends Component {
       tileInformation: [],
       testValue: '',
       unitToPlace: '',
-      unitImage: ''
+      unitImage: '',
     }
     this.setBoardState = this.setBoardState.bind(this)
     this.updateSectionValue = this.updateSectionValue.bind(this)
@@ -40,7 +40,7 @@ export default class Gameboard extends Component {
     for(let i=0;i<this.state.boardRows; i++){
       let tempInsideArray = []
       for(let i=0;i<this.state.boardColumns; i++){
-        tempInsideArray.push({})
+        tempInsideArray.push({controllingPlayer: ''})
       }
       tempArray.push(tempInsideArray)
     }
@@ -68,7 +68,8 @@ export default class Gameboard extends Component {
       tempBoardState[parseInt(this.state.selectedTileRow, 10) - 1][parseInt(this.state.selectedTileCol, 10) - 1].selected = false
     }
     tempBoardState[arrayRow][arrayCol].selected = true
-    if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol && this.state.unitToPlace !== ''){
+    console.log(tempBoardState[arrayRow][arrayCol].controllingPlayer)
+    if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol && this.state.unitToPlace !== '' && tempBoardState[arrayRow][arrayCol].controllingPlayer === ''){
       this.updateSectionValue(curRow, curCol)
     } else {
       this.setState({
