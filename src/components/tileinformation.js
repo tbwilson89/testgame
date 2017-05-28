@@ -9,9 +9,6 @@ export default class TileInformation extends Component {
           Unit Name: {this.props.information.unitName}
         </p>
         <p>
-          Space Value: {this.props.information.spaceValue}
-        </p>
-        <p>
           Controlling Player: {this.props.information.controllingPlayer}
         </p>
         <p>

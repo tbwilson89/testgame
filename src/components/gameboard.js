@@ -4,6 +4,8 @@ import PlaySpace from './playspace'
 import TileInformation from './tileinformation'
 import PlayerControls from './playercontrols'
 
+import UnitInformation from '../data/unitinformation'
+
 import warriorImage from '../images/warrior.png'
 import mageImage from '../images/mage.png'
 
@@ -14,16 +16,19 @@ export default class Gameboard extends Component {
     super()
 
     this.state = {
-      boardRows: 10,
+      boardRows: 5,
       boardColumns: 15,
       currentPlayer: 1,
+      playerOneInformation: {
+        resources: 1
+      },
+      playerTwoInformation: {
+        resources: 1
+      },
       boardState: [],
       selectedTileRow: 0,
       selectedTileCol: 0,
-      tileInformation: [],
-      testValue: '',
       unitToPlace: '',
-      unitImage: '',
     }
     this.setBoardState = this.setBoardState.bind(this)
     this.updateSectionValue = this.updateSectionValue.bind(this)
@@ -34,7 +39,6 @@ export default class Gameboard extends Component {
   componentWillMount(){
     this.setBoardState()
   }
-
   setBoardState(){
     let tempArray = []
     for(let i=0;i<this.state.boardRows; i++){
@@ -48,16 +52,27 @@ export default class Gameboard extends Component {
       boardState: tempArray
     })
   }
+
   handleControls(unit){
+    console.log(<UnitInformation unit={this.state.unitToPlace}/>)
     this.setState({
       unitToPlace: unit
     })
   }
   handleEndTurn(){
     let changePlayer = this.state.currentPlayer === 1 ? 2 : 1
-    this.setState({
-      currentPlayer: changePlayer
-    })
+    let addResource = changePlayer === 1 ? this.state.playerOneInformation.resources + 2 : this.state.playerTwoInformation.resources + 2
+    if(changePlayer === 1){
+      this.setState({
+        currentPlayer: changePlayer,
+        playerOneInformation: {resources: addResource}
+      })
+    } else {
+      this.setState({
+        currentPlayer: changePlayer,
+        playerTwoInformation: {resources: addResource}
+      })
+    }
   }
 
   selectTile(curRow, curCol){
@@ -68,7 +83,6 @@ export default class Gameboard extends Component {
       tempBoardState[parseInt(this.state.selectedTileRow, 10) - 1][parseInt(this.state.selectedTileCol, 10) - 1].selected = false
     }
     tempBoardState[arrayRow][arrayCol].selected = true
-    console.log(tempBoardState[arrayRow][arrayCol].controllingPlayer)
     if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol && this.state.unitToPlace !== '' && tempBoardState[arrayRow][arrayCol].controllingPlayer === ''){
       this.updateSectionValue(curRow, curCol)
     } else {
@@ -79,22 +93,47 @@ export default class Gameboard extends Component {
     }
   }
 
+  checkEnoughResources(curPlayer, unit){
+    if(curPlayer === 1){
+      
+    }
+  }
   updateSectionValue(curRow, curCol){
     let tempBoardState = this.state.boardState
     let arrayRow = curRow - 1
     let arrayCol = curCol - 1
-    tempBoardState[arrayRow][arrayCol].spaceValue = 'X'
+    let resourceChange = 0
+    if(this.checkEnoughResources(this.state.currentPlayer, this.state.unitToPlace)){
+
+    }
     tempBoardState[arrayRow][arrayCol].unitName = this.state.unitToPlace
     tempBoardState[arrayRow][arrayCol].controllingPlayer = this.state.currentPlayer
     switch(this.state.unitToPlace){
       case 'Warrior':
+      resourceChange = 2
       tempBoardState[arrayRow][arrayCol].unitImage = warriorImage
       break;
       case 'Mage':
+      resourceChange = 3
       tempBoardState[arrayRow][arrayCol].unitImage = mageImage
       break;
       default:
       break;
+    }
+    if(this.state.currentPlayer === 1){
+      let updateResource = this.state.playerOneInformation.resources - resourceChange
+      let updatePlayerInformation = this.state.playerOneInformation
+      updatePlayerInformation.resources = updateResource
+      this.setState({
+        playerOneInformation: updatePlayerInformation
+      })
+    } else {
+      let updateResource = this.state.playerTwoInformation.resources - resourceChange
+      let updatePlayerInformation = this.state.playerTwoInformation
+      updatePlayerInformation.resources = updateResource
+      this.setState({
+        playerTwoInformation: updatePlayerInformation
+      })
     }
 
 
@@ -143,6 +182,8 @@ export default class Gameboard extends Component {
           <PlayerControls
             handleClick={this.handleControls}
             handleEndTurn={this.handleEndTurn}
+            playerOneResource={this.state.playerOneInformation.resources}
+            playerTwoResource={this.state.playerTwoInformation.resources}
           />
           <img src={warriorImage} alt='this'></img>
         </div>
