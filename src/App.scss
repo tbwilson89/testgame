@@ -37,10 +37,13 @@
   box-shadow: 0 0 5px black;
 }
 .playerOneControls {
-  box-shadow: 0 0 2px lightgreen inset;
+  background-color: rgba(0,250,0,.2);
 }
-.playerOneControls {
-  box-shadow: 0 0 2px red inset;
+.playerTwoControls {
+  background-color: rgba(0,0,250,.2);
+}
+.tileInRange {
+  box-shadow: 0 0 7px red;
 }
 //UNITS
 #warrior {
