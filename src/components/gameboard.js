@@ -17,16 +17,15 @@ export default class Gameboard extends Component {
       boardColumns: 15,
       currentPlayer: 1,
       playerOneInformation: {
-        resources: 2
+        resources: 6
       },
       playerTwoInformation: {
-        resources: 2
+        resources: 6
       },
       boardState: [],
       selectedTileRow: 0,
       selectedTileCol: 0,
       unitToPlace: '',
-      unitInfo: ''
     }
     this.setBoardState = this.setBoardState.bind(this)
     this.updateSectionValue = this.updateSectionValue.bind(this)
@@ -34,6 +33,7 @@ export default class Gameboard extends Component {
     this.handleEndTurn = this.handleEndTurn.bind(this)
     this.selectTile = this.selectTile.bind(this)
     this.checkEnoughResources = this.checkEnoughResources.bind(this)
+    this.handleActionChoice = this.handleActionChoice.bind(this)
 
   }
   componentWillMount(){
@@ -47,7 +47,8 @@ export default class Gameboard extends Component {
         tempInsideArray.push({
           controllingPlayer: '',
           unitInfo: {},
-          inRange: false
+          inRange: false,
+          action: ''
         })
       }
       tempArray.push(tempInsideArray)
@@ -78,6 +79,17 @@ export default class Gameboard extends Component {
       })
     }
   }
+  handleActionChoice(value){
+    if(this.state.action === value){
+      this.setState({
+        action: ''
+      })
+    } else {
+      this.setState({
+        action: value
+      })
+    }
+  }
 
 
   //When clicking a tile, shows information first click, second click will place units if possible.
@@ -85,25 +97,24 @@ export default class Gameboard extends Component {
     let arrayRow = curRow - 1
     let arrayCol = curCol - 1
     let tempBoardState = this.state.boardState
+    if(this.state.action === 'move'){
+      //moveUnitAction()
+    }
     if(this.state.selectedTileRow !== 0 && this.state.selectedTileCol !== 0){
       tempBoardState[parseInt(this.state.selectedTileRow, 10) - 1][parseInt(this.state.selectedTileCol, 10) - 1].selected = false
     }
     tempBoardState[arrayRow][arrayCol].selected = true
-    /*if(typeof tempBoardState[this.state.selectedTileRow][this.state.selectedTileCol].unitInfo.name  !== 'undefined'){
-      tempBoardState = this.attackRangeHighlight(this.state.selectedTileRow - 1, this.state.selectedTileCol - 1, tempBoardState, false)
-    }*/
+    // remove range indicators from previous unit selections
     for(let i = 0; i < this.state.boardRows; i++){
       for(let j = 0; j < this.state.boardColumns; j++){
-        //console.log(tempBoardState[i])
         tempBoardState[i][j].inRange = false
       }
     }
     if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol && this.state.unitToPlace !== '' && tempBoardState[arrayRow][arrayCol].controllingPlayer === ''){
       this.updateSectionValue(curRow, curCol)
     } else {
-
       if(tempBoardState[arrayRow][arrayCol].unitInfo.name){
-        tempBoardState = this.attackRangeHighlight(arrayRow, arrayCol, tempBoardState, true)
+        tempBoardState = this.attackRangeHighlight(arrayRow, arrayCol, tempBoardState)
       }
     }
     this.setState({
@@ -113,35 +124,41 @@ export default class Gameboard extends Component {
     })
   }
 
-  attackRangeHighlight(arrRow, arrCol, boardState, setTo){
-    console.log(boardState[arrRow][arrCol].unitInfo.name)
+  moveUnitAction(){
+    //Needs to check if unit is selected and the move action has been chosen, then if a space within move range is selected after that.
+    //if(unit selected is controlled by current player and move action has been chosen and a space within range is selected){
+      //move tile information to selected space
+    //}
+  }
+
+  attackRangeHighlight(arrRow, arrCol, boardState){
     let unitRange = UnitInformation[boardState[arrRow][arrCol].unitInfo.name].range
     console.log('start!')
     for(var i=1; i<=unitRange; i++){
       if(typeof boardState[arrRow + i] !== 'undefined'){
-        boardState[arrRow + i][arrCol].inRange = setTo
+        boardState[arrRow + i][arrCol].inRange = true
       }
       if(typeof boardState[arrRow][arrCol + i] !== 'undefined'){
-        boardState[arrRow][arrCol + i].inRange = setTo
+        boardState[arrRow][arrCol + i].inRange = true
       }
       if(typeof boardState[arrRow - i] !== 'undefined'){
-        boardState[arrRow - i][arrCol].inRange = setTo
+        boardState[arrRow - i][arrCol].inRange = true
       }
       if(typeof boardState[arrRow][arrCol - i] !== 'undefined'){
-        boardState[arrRow][arrCol - i].inRange = setTo
+        boardState[arrRow][arrCol - i].inRange = true
       }
       if(unitRange >= 2 && i !== unitRange){
         if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol + i] !== 'undefined'){
-          boardState[arrRow + i][arrCol + i].inRange = setTo
+          boardState[arrRow + i][arrCol + i].inRange = true
         }
         if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol - i] !== 'undefined'){
-          boardState[arrRow - i][arrCol - i].inRange = setTo
+          boardState[arrRow - i][arrCol - i].inRange = true
         }
         if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol + i] !== 'undefined'){
-          boardState[arrRow - i][arrCol + i].inRange = setTo
+          boardState[arrRow - i][arrCol + i].inRange = true
         }
         if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol - i] !== 'undefined'){
-          boardState[arrRow + i][arrCol - i].inRange = setTo
+          boardState[arrRow + i][arrCol - i].inRange = true
         }
       }
     }
@@ -194,6 +211,8 @@ export default class Gameboard extends Component {
           <PlayerControls
             handleClick={this.handleControls}
             handleEndTurn={this.handleEndTurn}
+            handleAction={this.handleActionChoice}
+            currentAction={this.state.action}
             playerOneResource={this.state.playerOneInformation.resources}
             playerTwoResource={this.state.playerTwoInformation.resources}
           /><br/>
