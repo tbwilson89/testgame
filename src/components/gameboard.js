@@ -80,59 +80,72 @@ export default class Gameboard extends Component {
     }
   }
   handleActionChoice(value){
+    this.clearHighlight()
     if(this.state.action === value){
       this.setState({
         action: 'test'
       })
     } else {
+      let tempBoardState = this.state.boardState
+      let currentRow = this.state.selectedTileRow - 1
+      let currentCol = this.state.selectedTileCol - 1
+      if(value === 'move'){
+        this.highlightMoveRange(currentRow, currentCol, tempBoardState)
+      } else if(value === 'attack'){
+        this.highlightAttackRange(currentRow, currentCol, tempBoardState)
+      }
       this.setState({
+        boardState: tempBoardState,
         action: value
       })
     }
   }
 
-
-  //When clicking a tile, shows information first click, second click will place units if possible.
-  selectTile(curRow, curCol){
-    let arrayRow = curRow - 1
-    let arrayCol = curCol - 1
+  clearHighlight(){
     let tempBoardState = this.state.boardState
-    /*if(tempBoardState[arrayRow][arrayCol].unitInfo.name === undefined){
-      this.setState({action: ''})
-    }*/
-    if(this.state.action === 'move' && tempBoardState[arrayRow][arrayCol].canMove === true){
-      //moveUnitAction(arrayRow, arrayCol, tempBoardState)
-      console.log('Can Move!')
-      //tempBoardState = this.moveRangeHightlight(arrayRow, arrayCol, tempBoardState)
-    }
-    if(this.state.selectedTileRow !== 0 && this.state.selectedTileCol !== 0){
-      tempBoardState[parseInt(this.state.selectedTileRow, 10) - 1][parseInt(this.state.selectedTileCol, 10) - 1].selected = false
-    }
-    tempBoardState[arrayRow][arrayCol].selected = true
-    // remove range indicators from previous unit selections
     for(let i = 0; i < this.state.boardRows; i++){
       for(let j = 0; j < this.state.boardColumns; j++){
         tempBoardState[i][j].inRange = false
         tempBoardState[i][j].canMove = false
       }
     }
-    if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol && this.state.unitToPlace !== '' && tempBoardState[arrayRow][arrayCol].controllingPlayer === ''){
-      this.updateSectionValue(curRow, curCol)
-    } else {
-      if(tempBoardState[arrayRow][arrayCol].unitInfo.name){
-        if(this.state.action === 'attack'){
-          tempBoardState = this.attackRangeHighlight(arrayRow, arrayCol, tempBoardState)
-        }
-        if(this.state.action === 'move'){
-          tempBoardState = this.moveRangeHightlight(arrayRow, arrayCol, tempBoardState)
-        }
-      }
-    }
     this.setState({
-      selectedTileRow: curRow,
-      selectedTileCol: curCol,
       boardState: tempBoardState
     })
+  }
+
+  //When clicking a tile, shows information first click, second click will place units if possible.
+  selectTile(curRow, curCol){
+    let arrayRow = curRow - 1
+    let arrayCol = curCol - 1
+    let tempBoardState = this.state.boardState
+    let sameTileClicked = curRow === this.state.selectedTileRow && curCol === this.state.selectedTileCol ? true : false
+    if(!sameTileClicked || tempBoardState[arrayRow][arrayCol].unitInfo.name === undefined){
+        /*if(tempBoardState[arrayRow][arrayCol].unitInfo.name === undefined){
+        this.setState({action: ''})
+      }*/
+      if(this.state.action === 'move' && tempBoardState[arrayRow][arrayCol].canMove === true){
+        //moveUnitAction(arrayRow, arrayCol, tempBoardState)
+        console.log('Can Move!')
+        //tempBoardState = this.highlightMoveRange(arrayRow, arrayCol, tempBoardState)
+      }
+      if(this.state.selectedTileRow !== 0 && this.state.selectedTileCol !== 0){
+        tempBoardState[parseInt(this.state.selectedTileRow, 10) - 1][parseInt(this.state.selectedTileCol, 10) - 1].selected = false
+      }
+      tempBoardState[arrayRow][arrayCol].selected = true
+      // remove range indicators from previous unit selections
+      this.clearHighlight()
+      if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol && this.state.unitToPlace !== '' && tempBoardState[arrayRow][arrayCol].controllingPlayer === ''){
+        this.updateSectionValue(curRow, curCol)
+      }
+      this.setState({
+        selectedTileRow: curRow,
+        selectedTileCol: curCol,
+        boardState: tempBoardState
+      })
+    } else {
+
+    }
   }
 
   moveUnitAction(){
@@ -142,7 +155,7 @@ export default class Gameboard extends Component {
     //}
   }
 
-  moveRangeHightlight(arrRow, arrCol, boardState){
+  highlightMoveRange(arrRow, arrCol, boardState){
     let moveRange = UnitInformation[boardState[arrRow][arrCol].unitInfo.name].movement
     for(var i=1; i<=moveRange; i++){
       if(typeof boardState[arrRow + i] !== 'undefined'){
@@ -175,7 +188,7 @@ export default class Gameboard extends Component {
     return boardState
   }
 
-  attackRangeHighlight(arrRow, arrCol, boardState){
+  highlightAttackRange(arrRow, arrCol, boardState){
     let unitRange = UnitInformation[boardState[arrRow][arrCol].unitInfo.name].range
     for(var i=1; i<=unitRange; i++){
       if(typeof boardState[arrRow + i] !== 'undefined'){
