@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 
 export default class TileInformation extends Component {
   render(){
+    let moveButtonText = this.props.currentAction === 'move' ? 'Cancel Move' : 'Move Unit'
+    let attackButtonText = this.props.currentAction === 'attack' ? 'Cancel Attack' : 'Attack'
     if(this.props.information.controllingPlayer){
       return(
         <div className='tileInformation'>
@@ -17,12 +19,14 @@ export default class TileInformation extends Component {
           <p>
             Current Player: {this.props.currentPlayer}
           </p>
+          <button id='moveCommand' onClick={() => this.props.handleAction('move')}>{moveButtonText}</button>
+          <button id='attackCommand' onClick={() => this.props.handleAction('attack')}>{attackButtonText}</button>
         </div>
       )
     } else {
       return(
         <div>
-          
+
         </div>
       )
     }

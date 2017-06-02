@@ -8,6 +8,7 @@ let State = {
     power: 3,
     damageType: 'physical',
     range: 1,
+    movement: 2,
     health: 4,
     image: warriorImage
   },
@@ -17,6 +18,7 @@ let State = {
     power: 3,
     damageType: 'spell',
     range: 2,
+    movement: 2,
     health: 3,
     image: mageImage
   }

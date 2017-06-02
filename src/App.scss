@@ -45,6 +45,19 @@
 .tileInRange {
   box-shadow: 0 0 7px red;
 }
+.canMoveTo {
+  box-shadow: 0 0 7px yellow;
+}
+.unitStats {
+  position: relative;
+  top: -20px;
+  right: -25px;
+  text-shadow:
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff;
+}
 //UNITS
 #warrior {
 

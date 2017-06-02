@@ -82,7 +82,7 @@ export default class Gameboard extends Component {
   handleActionChoice(value){
     if(this.state.action === value){
       this.setState({
-        action: ''
+        action: 'test'
       })
     } else {
       this.setState({
@@ -97,8 +97,13 @@ export default class Gameboard extends Component {
     let arrayRow = curRow - 1
     let arrayCol = curCol - 1
     let tempBoardState = this.state.boardState
-    if(this.state.action === 'move'){
-      //moveUnitAction()
+    /*if(tempBoardState[arrayRow][arrayCol].unitInfo.name === undefined){
+      this.setState({action: ''})
+    }*/
+    if(this.state.action === 'move' && tempBoardState[arrayRow][arrayCol].canMove === true){
+      //moveUnitAction(arrayRow, arrayCol, tempBoardState)
+      console.log('Can Move!')
+      //tempBoardState = this.moveRangeHightlight(arrayRow, arrayCol, tempBoardState)
     }
     if(this.state.selectedTileRow !== 0 && this.state.selectedTileCol !== 0){
       tempBoardState[parseInt(this.state.selectedTileRow, 10) - 1][parseInt(this.state.selectedTileCol, 10) - 1].selected = false
@@ -108,13 +113,19 @@ export default class Gameboard extends Component {
     for(let i = 0; i < this.state.boardRows; i++){
       for(let j = 0; j < this.state.boardColumns; j++){
         tempBoardState[i][j].inRange = false
+        tempBoardState[i][j].canMove = false
       }
     }
     if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol && this.state.unitToPlace !== '' && tempBoardState[arrayRow][arrayCol].controllingPlayer === ''){
       this.updateSectionValue(curRow, curCol)
     } else {
       if(tempBoardState[arrayRow][arrayCol].unitInfo.name){
-        tempBoardState = this.attackRangeHighlight(arrayRow, arrayCol, tempBoardState)
+        if(this.state.action === 'attack'){
+          tempBoardState = this.attackRangeHighlight(arrayRow, arrayCol, tempBoardState)
+        }
+        if(this.state.action === 'move'){
+          tempBoardState = this.moveRangeHightlight(arrayRow, arrayCol, tempBoardState)
+        }
       }
     }
     this.setState({
@@ -131,9 +142,41 @@ export default class Gameboard extends Component {
     //}
   }
 
+  moveRangeHightlight(arrRow, arrCol, boardState){
+    let moveRange = UnitInformation[boardState[arrRow][arrCol].unitInfo.name].movement
+    for(var i=1; i<=moveRange; i++){
+      if(typeof boardState[arrRow + i] !== 'undefined'){
+        boardState[arrRow + i][arrCol].canMove = true
+      }
+      if(typeof boardState[arrRow][arrCol + i] !== 'undefined'){
+        boardState[arrRow][arrCol + i].canMove = true
+      }
+      if(typeof boardState[arrRow - i] !== 'undefined'){
+        boardState[arrRow - i][arrCol].canMove = true
+      }
+      if(typeof boardState[arrRow][arrCol - i] !== 'undefined'){
+        boardState[arrRow][arrCol - i].canMove = true
+      }
+      if(moveRange >= 2 && i !== moveRange){
+        if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol + i] !== 'undefined'){
+          boardState[arrRow + i][arrCol + i].canMove = true
+        }
+        if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol - i] !== 'undefined'){
+          boardState[arrRow - i][arrCol - i].canMove = true
+        }
+        if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol + i] !== 'undefined'){
+          boardState[arrRow - i][arrCol + i].canMove = true
+        }
+        if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol - i] !== 'undefined'){
+          boardState[arrRow + i][arrCol - i].canMove = true
+        }
+      }
+    }
+    return boardState
+  }
+
   attackRangeHighlight(arrRow, arrCol, boardState){
     let unitRange = UnitInformation[boardState[arrRow][arrCol].unitInfo.name].range
-    console.log('start!')
     for(var i=1; i<=unitRange; i++){
       if(typeof boardState[arrRow + i] !== 'undefined'){
         boardState[arrRow + i][arrCol].inRange = true
@@ -211,14 +254,14 @@ export default class Gameboard extends Component {
           <PlayerControls
             handleClick={this.handleControls}
             handleEndTurn={this.handleEndTurn}
-            handleAction={this.handleActionChoice}
-            currentAction={this.state.action}
             playerOneResource={this.state.playerOneInformation.resources}
             playerTwoResource={this.state.playerTwoInformation.resources}
           /><br/>
           <TileInformation
             information={information}
             currentPlayer={this.state.currentPlayer}
+            handleAction={this.handleActionChoice}
+            currentAction={this.state.action}
           />
         </div>
       </div>
