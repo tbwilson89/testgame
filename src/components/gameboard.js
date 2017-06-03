@@ -23,8 +23,9 @@ export default class Gameboard extends Component {
         resources: 6
       },
       boardState: [],
-      selectedTileRow: 0,
-      selectedTileCol: 0,
+      selectedTileRow: 1,
+      selectedTileCol: 1,
+      lastUnitSelected: {},
       unitToPlace: '',
     }
     this.setBoardState = this.setBoardState.bind(this)
@@ -119,33 +120,53 @@ export default class Gameboard extends Component {
     let arrayRow = curRow - 1
     let arrayCol = curCol - 1
     let tempBoardState = this.state.boardState
+    let prevRow = this.state.selectedTileRow - 1
+    let prevCol = this.state.selectedTileCol - 1
     let sameTileClicked = curRow === this.state.selectedTileRow && curCol === this.state.selectedTileCol ? true : false
-    if(!sameTileClicked || tempBoardState[arrayRow][arrayCol].unitInfo.name === undefined){
-        /*if(tempBoardState[arrayRow][arrayCol].unitInfo.name === undefined){
-        this.setState({action: ''})
-      }*/
-      if(this.state.action === 'move' && tempBoardState[arrayRow][arrayCol].canMove === true){
-        //moveUnitAction(arrayRow, arrayCol, tempBoardState)
-        console.log('Can Move!')
-        //tempBoardState = this.highlightMoveRange(arrayRow, arrayCol, tempBoardState)
-      }
-      if(this.state.selectedTileRow !== 0 && this.state.selectedTileCol !== 0){
-        tempBoardState[parseInt(this.state.selectedTileRow, 10) - 1][parseInt(this.state.selectedTileCol, 10) - 1].selected = false
-      }
+
+    console.log(tempBoardState[arrayRow][arrayCol].unitInfo.name)
+    if(arrayRow !== this.state.lastUnitSelected.row && arrayCol !== this.state.lastUnitSelected.col && tempBoardState[arrayRow][arrayCol].unitInfo.name !== undefined){
+      let obj = tempBoardState[arrayRow][arrayCol].unitInfo
+      this.setState({
+        lastUnitSelected: {
+          row: arrayRow,
+          col: arrayCol
+        }
+      })
+    }
+    console.log(this.state.lastUnitSelected.row)
+
+    if(tempBoardState[arrayRow][arrayCol].canMove === true || tempBoardState[arrayRow][arrayCol].inRange === true || sameTileClicked){
+
+    } else {
+      tempBoardState[prevRow][prevCol].selected = false
       tempBoardState[arrayRow][arrayCol].selected = true
-      // remove range indicators from previous unit selections
-      this.clearHighlight()
-      if(this.state.selectedTileRow === curRow && this.state.selectedTileCol === curCol && this.state.unitToPlace !== '' && tempBoardState[arrayRow][arrayCol].controllingPlayer === ''){
+    }
+
+
+    if(sameTileClicked){
+      if(tempBoardState[arrayRow][arrayCol].unitInfo.name === undefined && this.state.unitToPlace !== '' && tempBoardState[arrayRow][arrayCol].controllingPlayer === ''){
         this.updateSectionValue(curRow, curCol)
       }
-      this.setState({
-        selectedTileRow: curRow,
-        selectedTileCol: curCol,
-        boardState: tempBoardState
-      })
     } else {
-
+      if(this.state.action === 'move' && tempBoardState[arrayRow][arrayCol].canMove === true){
+        //move code
+        console.log('This is a movable spot!')
+      } else if (this.state.action === 'attack' && tempBoardState[arrayRow][arrayCol].inRange === true){
+        //attack code
+        console.log('This is in range to attack!')
+      } else {
+        this.clearHighlight()
+      }
     }
+    this.setState({
+      selectedTileRow: curRow,
+      selectedTileCol: curCol,
+      boardState: tempBoardState
+    })
+  }
+  addLastUnitSelected(){
+
   }
 
   moveUnitAction(){
@@ -158,29 +179,29 @@ export default class Gameboard extends Component {
   highlightMoveRange(arrRow, arrCol, boardState){
     let moveRange = UnitInformation[boardState[arrRow][arrCol].unitInfo.name].movement
     for(var i=1; i<=moveRange; i++){
-      if(typeof boardState[arrRow + i] !== 'undefined'){
+      if(typeof boardState[arrRow + i] !== 'undefined' && boardState[arrRow + 1][arrCol].controllingPlayer === ''){
         boardState[arrRow + i][arrCol].canMove = true
       }
-      if(typeof boardState[arrRow][arrCol + i] !== 'undefined'){
+      if(typeof boardState[arrRow][arrCol + i] !== 'undefined' && boardState[arrRow][arrCol + i].controllingPlayer === ''){
         boardState[arrRow][arrCol + i].canMove = true
       }
-      if(typeof boardState[arrRow - i] !== 'undefined'){
+      if(typeof boardState[arrRow - i] !== 'undefined' && boardState[arrRow - i][arrCol].controllingPlayer === ''){
         boardState[arrRow - i][arrCol].canMove = true
       }
-      if(typeof boardState[arrRow][arrCol - i] !== 'undefined'){
+      if(typeof boardState[arrRow][arrCol - i] !== 'undefined' && boardState[arrRow][arrCol - i].controllingPlayer === ''){
         boardState[arrRow][arrCol - i].canMove = true
       }
       if(moveRange >= 2 && i !== moveRange){
-        if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol + i] !== 'undefined'){
+        if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol + i] !== 'undefined' && boardState[arrRow + i][arrCol + i].controllingPlayer === ''){
           boardState[arrRow + i][arrCol + i].canMove = true
         }
-        if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol - i] !== 'undefined'){
+        if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol - i] !== 'undefined' && boardState[arrRow - i][arrCol - i].controllingPlayer === ''){
           boardState[arrRow - i][arrCol - i].canMove = true
         }
-        if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol + i] !== 'undefined'){
+        if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol + i] !== 'undefined' && boardState[arrRow - i][arrCol + i].controllingPlayer === ''){
           boardState[arrRow - i][arrCol + i].canMove = true
         }
-        if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol - i] !== 'undefined'){
+        if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol - i] !== 'undefined' && boardState[arrRow + i][arrCol - i].controllingPlayer === ''){
           boardState[arrRow + i][arrCol - i].canMove = true
         }
       }
@@ -230,7 +251,6 @@ export default class Gameboard extends Component {
       tempBoardState[arrayRow][arrayCol].unitName = this.state.unitToPlace
       tempBoardState[arrayRow][arrayCol].unitInfo = UnitInformation[this.state.unitToPlace]
       tempBoardState[arrayRow][arrayCol].controllingPlayer = this.state.currentPlayer
-      tempBoardState[arrayRow][arrayCol].unitImage = UnitInformation[this.state.unitToPlace].image
       let playerInformation = this.state.currentPlayer === 1 ? 'playerOneInformation' : 'playerTwoInformation'
       let updateResource = this.state[playerInformation].resources - resourceChange
       let updatePlayerInformation = this.state[playerInformation]
