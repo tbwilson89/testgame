@@ -41,7 +41,7 @@
   background-color: rgba(0, 0, 250, 0.2); }
 
 .tileInRange {
-  box-shadow: 0 0 7px red; }
+  box-shadow: 0 0 7px red inset; }
 
 .canMoveTo {
   box-shadow: 0 0 20px yellow inset; }

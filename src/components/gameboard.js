@@ -49,7 +49,6 @@ export default class Gameboard extends Component {
           controllingPlayer: '',
           unitInfo: {},
           inRange: false,
-          action: ''
         })
       }
       tempArray.push(tempInsideArray)
@@ -80,16 +79,20 @@ export default class Gameboard extends Component {
       })
     }
   }
+
   handleActionChoice(value){
     this.clearHighlight()
+    let tempBoardState = this.state.boardState
     if(this.state.action === value){
       this.setState({
         action: 'test'
       })
     } else {
-      let tempBoardState = this.state.boardState
-      let currentRow = this.state.selectedTileRow - 1
-      let currentCol = this.state.selectedTileCol - 1
+      console.log(this.state.selectedTileRow + ' ' +this.state.selectedTileCol)
+      console.log(tempBoardState)
+
+      let currentRow = this.state.selectedTileRow
+      let currentCol = this.state.selectedTileCol
       if(value === 'move'){
         this.highlightMoveRange(currentRow, currentCol, tempBoardState)
       } else if(value === 'attack'){
@@ -97,7 +100,11 @@ export default class Gameboard extends Component {
       }
       this.setState({
         boardState: tempBoardState,
-        action: value
+        action: value,
+        activeUnitLocation: {
+          row: currentRow,
+          col: currentCol
+        }
       })
     }
   }
@@ -111,102 +118,104 @@ export default class Gameboard extends Component {
       }
     }
     this.setState({
-      boardState: tempBoardState
+      boardState: tempBoardState,
+      action: ''
     })
   }
 
   //When clicking a tile, shows information first click, second click will place units if possible.
   selectTile(curRow, curCol){
-    let arrayRow = curRow - 1
-    let arrayCol = curCol - 1
     let tempBoardState = this.state.boardState
-    let prevRow = this.state.selectedTileRow - 1
-    let prevCol = this.state.selectedTileCol - 1
+    let prevRow = this.state.selectedTileRow
+    let prevCol = this.state.selectedTileCol
     let sameTileClicked = curRow === this.state.selectedTileRow && curCol === this.state.selectedTileCol ? true : false
 
-    console.log(tempBoardState[arrayRow][arrayCol].unitInfo.name)
-    if(arrayRow !== this.state.lastUnitSelected.row && arrayCol !== this.state.lastUnitSelected.col && tempBoardState[arrayRow][arrayCol].unitInfo.name !== undefined){
-      let obj = tempBoardState[arrayRow][arrayCol].unitInfo
-      this.setState({
-        lastUnitSelected: {
-          row: arrayRow,
-          col: arrayCol
-        }
-      })
-    }
-    console.log(this.state.lastUnitSelected.row)
 
-    if(tempBoardState[arrayRow][arrayCol].canMove === true || tempBoardState[arrayRow][arrayCol].inRange === true || sameTileClicked){
+    if(tempBoardState[curRow][curCol].canMove === true || tempBoardState[curRow][curCol].inRange === true || sameTileClicked){
 
     } else {
       tempBoardState[prevRow][prevCol].selected = false
-      tempBoardState[arrayRow][arrayCol].selected = true
+      tempBoardState[curRow][curCol].selected = true
     }
 
 
     if(sameTileClicked){
-      if(tempBoardState[arrayRow][arrayCol].unitInfo.name === undefined && this.state.unitToPlace !== '' && tempBoardState[arrayRow][arrayCol].controllingPlayer === ''){
+      if(this.state.action === 'move'){
+        tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col].unitInfo.actions -= 1
+        tempBoardState[curRow][curCol] = tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col]
+        tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col] = {
+          controllingPlayer: '',
+          unitInfo: {},
+          inRange: false,
+        }
+        this.clearHighlight()
+      } else if(tempBoardState[curRow][curCol].unitInfo.name === undefined && this.state.unitToPlace !== '' && tempBoardState[curRow][curCol].controllingPlayer === ''){
         this.updateSectionValue(curRow, curCol)
       }
     } else {
-      if(this.state.action === 'move' && tempBoardState[arrayRow][arrayCol].canMove === true){
+      if(this.state.action === 'move' && tempBoardState[curRow][curCol].canMove === true){
         //move code
-        console.log('This is a movable spot!')
-      } else if (this.state.action === 'attack' && tempBoardState[arrayRow][arrayCol].inRange === true){
+        console.log('This is a movable spot! Click again to move unit!')
+      } else if (this.state.action === 'attack' && tempBoardState[curRow][curCol].inRange === true){
         //attack code
-        console.log('This is in range to attack!')
-      } else {
+        console.log('This is in range to attack! Click again to declare attack!')
+      } else if(curRow !== this.state.lastUnitSelected.row && curCol !== this.state.lastUnitSelected.col){
         this.clearHighlight()
+        this.setState({
+          action: ''
+        })
       }
     }
     this.setState({
       selectedTileRow: curRow,
       selectedTileCol: curCol,
-      boardState: tempBoardState
+      boardState: tempBoardState,
     })
-  }
-  addLastUnitSelected(){
-
-  }
-
-  moveUnitAction(){
-    //Needs to check if unit is selected and the move action has been chosen, then if a space within move range is selected after that.
-    //if(unit selected is controlled by current player and move action has been chosen and a space within range is selected){
-      //move tile information to selected space
-    //}
   }
 
   highlightMoveRange(arrRow, arrCol, boardState){
     let moveRange = UnitInformation[boardState[arrRow][arrCol].unitInfo.name].movement
-    for(var i=1; i<=moveRange; i++){
-      if(typeof boardState[arrRow + i] !== 'undefined' && boardState[arrRow + 1][arrCol].controllingPlayer === ''){
-        boardState[arrRow + i][arrCol].canMove = true
-      }
-      if(typeof boardState[arrRow][arrCol + i] !== 'undefined' && boardState[arrRow][arrCol + i].controllingPlayer === ''){
-        boardState[arrRow][arrCol + i].canMove = true
-      }
-      if(typeof boardState[arrRow - i] !== 'undefined' && boardState[arrRow - i][arrCol].controllingPlayer === ''){
-        boardState[arrRow - i][arrCol].canMove = true
-      }
-      if(typeof boardState[arrRow][arrCol - i] !== 'undefined' && boardState[arrRow][arrCol - i].controllingPlayer === ''){
-        boardState[arrRow][arrCol - i].canMove = true
-      }
-      if(moveRange >= 2 && i !== moveRange){
-        if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol + i] !== 'undefined' && boardState[arrRow + i][arrCol + i].controllingPlayer === ''){
-          boardState[arrRow + i][arrCol + i].canMove = true
+    let prevHighlights = [[arrRow, arrCol]]
+    for(let j=0;j<moveRange;j++){
+      let newPrevHighlights = []
+      for(let i=0;i<prevHighlights.length;i++){
+        let prevRow = prevHighlights[i][0]
+        let prevCol = prevHighlights[i][1]
+        if(typeof boardState[prevRow + 1] !== 'undefined'){
+          if(boardState[prevRow + 1][prevCol].controllingPlayer === ''){
+            boardState[prevRow + 1][prevCol].canMove = true
+            newPrevHighlights.push([prevHighlights[i][0] + 1, prevCol])
+          } else if(boardState[prevRow + 1][prevCol].controllingPlayer === this.state.currentPlayer){
+            newPrevHighlights.push([prevHighlights[i][0] + 1, prevCol])
+          }
         }
-        if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol - i] !== 'undefined' && boardState[arrRow - i][arrCol - i].controllingPlayer === ''){
-          boardState[arrRow - i][arrCol - i].canMove = true
+        if(typeof boardState[prevRow][prevCol + 1] !== 'undefined'){
+          if(boardState[prevRow][prevCol + 1].controllingPlayer === ''){
+            boardState[prevRow][prevCol + 1].canMove = true
+            newPrevHighlights.push([prevRow, prevCol + 1])
+          } else if(boardState[prevRow][prevCol + 1].controllingPlayer === this.state.currentPlayer){
+            newPrevHighlights.push([prevRow, prevCol + 1])
+          }
         }
-        if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol + i] !== 'undefined' && boardState[arrRow - i][arrCol + i].controllingPlayer === ''){
-          boardState[arrRow - i][arrCol + i].canMove = true
+        if(typeof boardState[prevRow - 1] !== 'undefined'){
+          if(boardState[prevRow - 1][prevCol].controllingPlayer === ''){
+            boardState[prevRow - 1][prevCol].canMove = true
+            newPrevHighlights.push([prevRow - 1, prevCol])
+          } else if(boardState[prevRow - 1][prevCol].controllingPlayer === this.state.currentPlayer){
+            newPrevHighlights.push([prevRow - 1, prevCol])
+          }
         }
-        if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol - i] !== 'undefined' && boardState[arrRow + i][arrCol - i].controllingPlayer === ''){
-          boardState[arrRow + i][arrCol - i].canMove = true
+        if(typeof boardState[prevRow][prevCol - 1] !== 'undefined'){
+          if(boardState[prevRow][prevCol - 1].controllingPlayer === ''){
+            boardState[prevRow][prevCol - 1].canMove = true
+            newPrevHighlights.push([prevRow, prevCol - 1])
+          } else if(boardState[prevRow][prevCol - 1].controllingPlayer === this.state.currentPlayer){
+            newPrevHighlights.push([prevRow, prevCol - 1])
+          }
         }
       }
+      prevHighlights = newPrevHighlights
     }
-    return boardState
   }
 
   highlightAttackRange(arrRow, arrCol, boardState){
@@ -244,13 +253,11 @@ export default class Gameboard extends Component {
 
   updateSectionValue(curRow, curCol){
     let tempBoardState = this.state.boardState
-    let arrayRow = curRow - 1
-    let arrayCol = curCol - 1
     let resourceChange = UnitInformation[this.state.unitToPlace].cost
     if(this.checkEnoughResources(this.state.currentPlayer, this.state.unitToPlace)){
-      tempBoardState[arrayRow][arrayCol].unitName = this.state.unitToPlace
-      tempBoardState[arrayRow][arrayCol].unitInfo = UnitInformation[this.state.unitToPlace]
-      tempBoardState[arrayRow][arrayCol].controllingPlayer = this.state.currentPlayer
+      tempBoardState[curRow][curCol].unitName = this.state.unitToPlace
+      tempBoardState[curRow][curCol].unitInfo = UnitInformation[this.state.unitToPlace]
+      tempBoardState[curRow][curCol].controllingPlayer = this.state.currentPlayer
       let playerInformation = this.state.currentPlayer === 1 ? 'playerOneInformation' : 'playerTwoInformation'
       let updateResource = this.state[playerInformation].resources - resourceChange
       let updatePlayerInformation = this.state[playerInformation]
@@ -258,8 +265,12 @@ export default class Gameboard extends Component {
       let obj = {}
       obj[playerInformation] = updatePlayerInformation
       this.setState(obj)
+      this.setState({
+        unitToPlace: ''
+      })
     }
   }
+
   checkEnoughResources(curPlayer, unit){
     let playerInformation = curPlayer === 1 ? 'playerOneInformation' : 'playerTwoInformation'
     if(this.state[playerInformation].resources >= UnitInformation[this.state.unitToPlace].cost){
@@ -270,8 +281,8 @@ export default class Gameboard extends Component {
   }
 
   render(){
-    let row = parseInt(this.state.selectedTileRow, 10) - 1 >= 0 ? parseInt(this.state.selectedTileRow, 10) - 1 : 0
-    let col = parseInt(this.state.selectedTileCol, 10) - 1 >= 0 ? parseInt(this.state.selectedTileCol, 10) - 1 : 0
+    let row = parseInt(this.state.selectedTileRow, 10) >= 0 ? parseInt(this.state.selectedTileRow, 10) : 0
+    let col = parseInt(this.state.selectedTileCol, 10) >= 0 ? parseInt(this.state.selectedTileCol, 10) : 0
     let information
     information = this.state.boardState[row][col]
 

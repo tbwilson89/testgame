@@ -10,6 +10,7 @@ let State = {
     range: 1,
     movement: 2,
     health: 4,
+    actions: 1,
     image: warriorImage
   },
   Mage: {
@@ -20,6 +21,7 @@ let State = {
     range: 2,
     movement: 2,
     health: 3,
+    actions: 1,
     image: mageImage
   }
 }
