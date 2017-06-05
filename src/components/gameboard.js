@@ -27,6 +27,10 @@ export default class Gameboard extends Component {
       selectedTileCol: 1,
       lastUnitSelected: {},
       unitToPlace: '',
+      activeUnitLocation: {
+        row: '',
+        col: ''
+      }
     }
     this.setBoardState = this.setBoardState.bind(this)
     this.updateSectionValue = this.updateSectionValue.bind(this)
@@ -129,18 +133,19 @@ export default class Gameboard extends Component {
     let prevRow = this.state.selectedTileRow
     let prevCol = this.state.selectedTileCol
     let sameTileClicked = curRow === this.state.selectedTileRow && curCol === this.state.selectedTileCol ? true : false
+    let clickActiveUnit = curRow === this.state.activeUnitLocation.row && curCol === this.state.activeUnitLocation.col ? true : false
 
+    console.log(this.state.activeUnitLocation.row +' '+this.state.activeUnitLocation.col)
 
-    if(tempBoardState[curRow][curCol].canMove === true || tempBoardState[curRow][curCol].inRange === true || sameTileClicked){
+    if(tempBoardState[curRow][curCol].canMove === true || tempBoardState[curRow][curCol].inRange === true){
 
     } else {
       tempBoardState[prevRow][prevCol].selected = false
       tempBoardState[curRow][curCol].selected = true
     }
 
-
     if(sameTileClicked){
-      if(this.state.action === 'move'){
+      if(this.state.action === 'move' && !clickActiveUnit){
         tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col].unitInfo.actions -= 1
         tempBoardState[curRow][curCol] = tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col]
         tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col] = {
@@ -159,7 +164,7 @@ export default class Gameboard extends Component {
       } else if (this.state.action === 'attack' && tempBoardState[curRow][curCol].inRange === true){
         //attack code
         console.log('This is in range to attack! Click again to declare attack!')
-      } else if(curRow !== this.state.lastUnitSelected.row && curCol !== this.state.lastUnitSelected.col){
+      } else if(curRow !== this.state.lastUnitSelected.row && curCol !== this.state.lastUnitSelected.col && !clickActiveUnit){
         this.clearHighlight()
         this.setState({
           action: ''
