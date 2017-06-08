@@ -155,6 +155,8 @@ export default class Gameboard extends Component {
         this.clearHighlight()
       } else if(this.state.action === 'attack'){
         //THIS IS WHERE I'M WORKING?!?!?
+        tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col].unitInfo.health -= tempBoardState[curRow][curCol].unitInfo.power
+        tempBoardState[curRow][curCol].unitInfo.health -= tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col].unitInfo.power
       } else if(tempBoardState[curRow][curCol].unitInfo.name === undefined && this.state.unitToPlace !== '' && tempBoardState[curRow][curCol].controllingPlayer === ''){
         this.updateSectionValue(curRow, curCol)
       }
@@ -256,9 +258,11 @@ export default class Gameboard extends Component {
   updateSectionValue(curRow, curCol){
     let tempBoardState = this.state.boardState
     let resourceChange = UnitInformation[this.state.unitToPlace].cost
+    let testCopyObj = {...UnitInformation[this.state.unitToPlace]}
+    console.log(testCopyObj)
     if(this.checkEnoughResources(this.state.currentPlayer, this.state.unitToPlace)){
       tempBoardState[curRow][curCol].unitName = this.state.unitToPlace
-      tempBoardState[curRow][curCol].unitInfo = UnitInformation[this.state.unitToPlace]
+      tempBoardState[curRow][curCol].unitInfo = {...UnitInformation[this.state.unitToPlace]}
       tempBoardState[curRow][curCol].controllingPlayer = this.state.currentPlayer
       let playerInformation = this.state.currentPlayer === 1 ? 'playerOneInformation' : 'playerTwoInformation'
       let updateResource = this.state[playerInformation].resources - resourceChange
