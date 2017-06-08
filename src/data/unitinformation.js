@@ -1,5 +1,6 @@
 import warriorImage from '../images/warrior.png'
 import mageImage from '../images/mage.png'
+//import ninjaImage from '../images/ninja.png'
 
 let State = {
   Warrior: {
@@ -23,6 +24,17 @@ let State = {
     health: 3,
     actions: 1,
     image: mageImage
+  },
+  Ninja: {
+    name: 'Ninja',
+    cost: 3,
+    power: 2,
+    damageType: 'physical',
+    range: 1,
+    movement: 3,
+    health: 2,
+    actions: 1,
+    //image: ninjaImage
   }
 }
 

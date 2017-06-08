@@ -63,6 +63,7 @@ export default class Gameboard extends Component {
   }
   //For when a button is pressed to set the unit to be placed by a player
   handleControls(unit){
+    this.clearHighlight()
     this.setState({
       unitToPlace: unit
     })
@@ -71,6 +72,7 @@ export default class Gameboard extends Component {
   handleEndTurn(){
     let changePlayer = this.state.currentPlayer === 1 ? 2 : 1
     let addResource = changePlayer === 1 ? this.state.playerOneInformation.resources + 2 : this.state.playerTwoInformation.resources + 2
+    this.clearHighlight()
     if(changePlayer === 1){
       this.setState({
         currentPlayer: changePlayer,
@@ -92,9 +94,6 @@ export default class Gameboard extends Component {
         action: 'test'
       })
     } else {
-      console.log(this.state.selectedTileRow + ' ' +this.state.selectedTileCol)
-      console.log(tempBoardState)
-
       let currentRow = this.state.selectedTileRow
       let currentCol = this.state.selectedTileCol
       if(value === 'move'){
@@ -102,9 +101,11 @@ export default class Gameboard extends Component {
       } else if(value === 'attack'){
         this.highlightAttackRange(currentRow, currentCol, tempBoardState)
       }
+      console.log(tempBoardState[currentRow - 1][currentCol - 1].canMove)
       this.setState({
         boardState: tempBoardState,
         action: value,
+        unitToPlace: '',
         activeUnitLocation: {
           row: currentRow,
           col: currentCol
@@ -135,8 +136,6 @@ export default class Gameboard extends Component {
     let sameTileClicked = curRow === this.state.selectedTileRow && curCol === this.state.selectedTileCol ? true : false
     let clickActiveUnit = curRow === this.state.activeUnitLocation.row && curCol === this.state.activeUnitLocation.col ? true : false
 
-    console.log(this.state.activeUnitLocation.row +' '+this.state.activeUnitLocation.col)
-
     if(tempBoardState[curRow][curCol].canMove === true || tempBoardState[curRow][curCol].inRange === true){
 
     } else {
@@ -154,6 +153,8 @@ export default class Gameboard extends Component {
           inRange: false,
         }
         this.clearHighlight()
+      } else if(this.state.action === 'attack'){
+        //THIS IS WHERE I'M WORKING?!?!?
       } else if(tempBoardState[curRow][curCol].unitInfo.name === undefined && this.state.unitToPlace !== '' && tempBoardState[curRow][curCol].controllingPlayer === ''){
         this.updateSectionValue(curRow, curCol)
       }
@@ -224,36 +225,32 @@ export default class Gameboard extends Component {
   }
 
   highlightAttackRange(arrRow, arrCol, boardState){
-    let unitRange = UnitInformation[boardState[arrRow][arrCol].unitInfo.name].range
-    for(var i=1; i<=unitRange; i++){
-      if(typeof boardState[arrRow + i] !== 'undefined'){
-        boardState[arrRow + i][arrCol].inRange = true
-      }
-      if(typeof boardState[arrRow][arrCol + i] !== 'undefined'){
-        boardState[arrRow][arrCol + i].inRange = true
-      }
-      if(typeof boardState[arrRow - i] !== 'undefined'){
-        boardState[arrRow - i][arrCol].inRange = true
-      }
-      if(typeof boardState[arrRow][arrCol - i] !== 'undefined'){
-        boardState[arrRow][arrCol - i].inRange = true
-      }
-      if(unitRange >= 2 && i !== unitRange){
-        if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol + i] !== 'undefined'){
-          boardState[arrRow + i][arrCol + i].inRange = true
+    let attackRange = UnitInformation[boardState[arrRow][arrCol].unitInfo.name].range
+    let prevHighlights = [[arrRow, arrCol]]
+    for(let j=0;j<attackRange;j++){
+      let newPrevHighlights = []
+      for(let i=0;i<prevHighlights.length;i++){
+        let prevRow = prevHighlights[i][0]
+        let prevCol = prevHighlights[i][1]
+        if(typeof boardState[prevRow + 1] !== 'undefined'){
+          boardState[prevRow + 1][prevCol].inRange = true
+          newPrevHighlights.push([prevHighlights[i][0] + 1, prevCol])
         }
-        if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol - i] !== 'undefined'){
-          boardState[arrRow - i][arrCol - i].inRange = true
+        if(typeof boardState[prevRow][prevCol + 1] !== 'undefined'){
+          boardState[prevRow][prevCol + 1].inRange = true
+          newPrevHighlights.push([prevRow, prevCol + 1])
         }
-        if(typeof boardState[arrRow - i] !== 'undefined' && typeof boardState[arrRow - i][arrCol + i] !== 'undefined'){
-          boardState[arrRow - i][arrCol + i].inRange = true
+        if(typeof boardState[prevRow - 1] !== 'undefined'){
+          boardState[prevRow - 1][prevCol].inRange = true
+          newPrevHighlights.push([prevRow - 1, prevCol])
         }
-        if(typeof boardState[arrRow + i] !== 'undefined' && typeof boardState[arrRow + i][arrCol - i] !== 'undefined'){
-          boardState[arrRow + i][arrCol - i].inRange = true
+        if(typeof boardState[prevRow][prevCol - 1] !== 'undefined'){
+          boardState[prevRow][prevCol - 1].inRange = true
+          newPrevHighlights.push([prevRow, prevCol - 1])
         }
       }
+      prevHighlights = newPrevHighlights
     }
-    return boardState
   }
 
   updateSectionValue(curRow, curCol){
@@ -288,8 +285,7 @@ export default class Gameboard extends Component {
   render(){
     let row = parseInt(this.state.selectedTileRow, 10) >= 0 ? parseInt(this.state.selectedTileRow, 10) : 0
     let col = parseInt(this.state.selectedTileCol, 10) >= 0 ? parseInt(this.state.selectedTileCol, 10) : 0
-    let information
-    information = this.state.boardState[row][col]
+    let information = this.state.boardState[row][col]
 
     return(
       <div className='gameBoard'>

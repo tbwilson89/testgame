@@ -14,7 +14,7 @@ export default class RowSection extends Component {
     } else {
       return(
         <div id={'row'+this.props.curRow+'col'+this.props.curCol} className={'boardSection '+tileSelected +' '+rangeIndicator+' '+ controlClass} onClick={() => this.props.handleClick(this.props.curRow, this.props.curCol)}>
-          <img src={this.props.currentValue.unitInfo.image} alt='unit'></img>
+          <img src={this.props.currentValue.unitInfo.image} alt={this.props.currentValue.unitInfo.name}></img>
           <span className='unitStats'>{this.props.currentValue.unitInfo.power +'/'+this.props.currentValue.unitInfo.health}</span>
         </div>
       )
