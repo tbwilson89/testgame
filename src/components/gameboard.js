@@ -157,6 +157,7 @@ export default class Gameboard extends Component {
         //THIS IS WHERE I'M WORKING?!?!?
         tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col].unitInfo.health -= tempBoardState[curRow][curCol].unitInfo.power
         tempBoardState[curRow][curCol].unitInfo.health -= tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col].unitInfo.power
+        this.checkState(tempBoardState)
       } else if(tempBoardState[curRow][curCol].unitInfo.name === undefined && this.state.unitToPlace !== '' && tempBoardState[curRow][curCol].controllingPlayer === ''){
         this.updateSectionValue(curRow, curCol)
       }
@@ -284,6 +285,21 @@ export default class Gameboard extends Component {
     } else {
       return false
     }
+  }
+
+  checkState(boardState){
+    for(let i = 0; i < this.state.boardRows; i++){
+      for(let j = 0; j < this.state.boardColumns; j++){
+        if(boardState[i][j].unitInfo.health <= 0){
+          boardState[i][j].unitInfo = {}
+          boardState[i][j].controllingPlayer = ''
+          this.clearHighlight()
+        }
+      }
+    }
+    this.setState({
+      boardState: boardState
+    })
   }
 
   render(){
