@@ -35,6 +35,16 @@ let State = {
     health: 2,
     actions: 1,
     //image: ninjaImage
+  },
+  Sniper: {
+    name: 'Sniper',
+    cost: 4,
+    power: 4,
+    damageType: 'physical',
+    range: 4,
+    movement: 1,
+    health: 2,
+    actions: 1,
   }
 }
 

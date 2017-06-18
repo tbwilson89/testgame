@@ -39,6 +39,7 @@ export default class Gameboard extends Component {
     this.selectTile = this.selectTile.bind(this)
     this.checkEnoughResources = this.checkEnoughResources.bind(this)
     this.handleActionChoice = this.handleActionChoice.bind(this)
+    this.inCounterAttackRange = this.inCounterAttackRange.bind(this)
 
   }
   componentWillMount(){
@@ -155,8 +156,10 @@ export default class Gameboard extends Component {
         this.clearHighlight()
       } else if(this.state.action === 'attack'){
         //THIS IS WHERE I'M WORKING?!?!?
-        tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col].unitInfo.health -= tempBoardState[curRow][curCol].unitInfo.power
         tempBoardState[curRow][curCol].unitInfo.health -= tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col].unitInfo.power
+        if(this.inCounterAttackRange(curRow, curCol, tempBoardState)){
+          tempBoardState[this.state.activeUnitLocation.row][this.state.activeUnitLocation.col].unitInfo.health -= tempBoardState[curRow][curCol].unitInfo.power
+        }
         this.checkState(tempBoardState)
       } else if(tempBoardState[curRow][curCol].unitInfo.name === undefined && this.state.unitToPlace !== '' && tempBoardState[curRow][curCol].controllingPlayer === ''){
         this.updateSectionValue(curRow, curCol)
@@ -253,6 +256,13 @@ export default class Gameboard extends Component {
         }
       }
       prevHighlights = newPrevHighlights
+    }
+  }
+
+  inCounterAttackRange(row, col, boardState){
+    if(Math.abs((this.state.activeUnitLocation.row - row)+(this.state.activeUnitLocation.col - col)) <= boardState[row][col].unitInfo.range){
+      console.log('Pass Check!')
+      return true
     }
   }
 
